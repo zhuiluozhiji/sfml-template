@@ -37,6 +37,8 @@ int main()
             // "close requested" event: we close the window
             if (event.type == Event::Closed)
                 window.close();
+            if(event.type == Event::KeyPressed && event.key.code == Keyboard::Escape)
+                window.close();
         }
 
         // Update hoop 
@@ -63,6 +65,7 @@ int main()
 
         //Collision ball
         if(ball.getPosition().y <= 0 || ball.getGlobalBounds().intersects(hoop.getGlobalBounds())){
+            //Reset ball
             isShot = false;
             //ball.setPosition(Vector2f(0, window.getSize().y - ball.getRadius()*3));
         }
