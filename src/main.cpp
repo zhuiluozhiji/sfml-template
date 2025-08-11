@@ -1,9 +1,6 @@
-#include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
-#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 #include <iostream>
-#include <vector>
-#include <cstdlib>
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
@@ -14,112 +11,111 @@ using namespace std;
 int main()
 {
     srand(time(NULL));
-    // create the window
-    RenderWindow window(VideoMode(800, 800), "BALL SHOOTING");
+    RenderWindow window(VideoMode(800, 600), "Cat doge");
     window.setFramerateLimit(60); // limit the frame rate to 60 FPS
 
 
-    CircleShape projectile;
-    projectile.setRadius(5.f);
-    projectile.setFillColor(Color::Red);
+//CAT
+    Texture catTex;
+    Sprite cat;
+    int hp = 10;
+    RectangleShape hpBar;
+    hpBar.setSize(Vector2f((float)hp * 20.f, 20.f));
+    hpBar.setFillColor(Color::Red);
+    hpBar.setPosition(200.f, 10.f);
 
-    RectangleShape enemy;
-    enemy.setFillColor(Color::Magenta);
-    enemy.setSize(Vector2f(50.f,50.f));
-    int enemySpawnTimer = 0;
+    //if(!catTex.loadFromFile("/home/man567/code/sfml-template/Textures/cat.png"))
+    if (!catTex.loadFromFile("Textures/cat11.png"))
+        throw "Could not load cat texture";
 
-    CircleShape player;
-    player.setFillColor(Color::White);
-    player.setRadius(50.f);
-    player.setPosition(window.getSize().x / 2 - player.getRadius(), window.getSize().y - player.getRadius() * 2 - 10.f);
-    Vector2f playerCenter ;
-    int shootTimer = 0;
+    cat.setTexture(catTex);
+    cat.setScale(0.1f, 0.1f); // scale the cat sprite to half its size
 
+    vector<Sprite> cats;
+    cats.push_back(cat);
+    int catSpawnTimer = 20;
 
-    vector<CircleShape> projectiles;
-    projectiles.push_back(projectile);
-    vector<RectangleShape> enemies;
-    enemies.push_back(enemy);
+//DOGE
+    Texture dogeTex;
+    Sprite doge;
 
+    if (!dogeTex.loadFromFile("Textures/doge.png"))
+        throw "Could not load doge texture";
 
+    doge.setTexture(dogeTex);
+    doge.setScale(0.04f, 0.04f); // scale the doge sprite to half its size
 
-    while (window.isOpen())
+//GAME LOOP
+    while (window.isOpen() && hp > 0) // game loop runs while the window is open and the player has health
     {
+        // check all the window's events that were triggered since the last iteration of the loop
         Event event;
         while (window.pollEvent(event))
         {
             // "close requested" event: we close the window
             if (event.type == Event::Closed)
                 window.close();
-        }
-
-//player
-    
-        playerCenter = player.getPosition() + Vector2f(player.getRadius(), player.getRadius());
-        if(shootTimer < 5){
-            shootTimer++;
-        }
-        player.setPosition(Mouse::getPosition(window).x - player.getRadius(), player.getPosition().y);
-
-//projectile
-        if(Mouse::isButtonPressed(Mouse::Left) && shootTimer >= 5){
-            projectile.setPosition(playerCenter);
-            projectiles.push_back(projectile);
-
-            shootTimer = 0;
-        }
-
-        for(size_t i = 0; i < projectiles.size(); i++){
-            projectiles[i].move(0.f, -10.f);
-            if(projectiles[i].getPosition().y <= 0){
-                projectiles.erase(projectiles.begin() + i);
+            if( event.type == Event::KeyPressed && event.key.code == Keyboard::Escape) // if the escape key is pressed
+            {
+                window.close(); // close the window
             }
         }
-
-//enemy
-        if(enemySpawnTimer < 20){
-            enemySpawnTimer++;
-        } 
-        else {
-            enemy.setPosition(rand() % (window.getSize().x - (int)enemy.getSize().x), 0.f);
-            enemies.push_back(enemy);
-            enemySpawnTimer = 0;
-        }
-        for(size_t i = 0; i < enemies.size(); i++){
-            enemies[i].move(0.f, 5.f);
-            if(enemies[i].getPosition().y >= window.getSize().y){
-                enemies.erase(enemies.begin() + i);
+//UPDATE
+//cat(enemies)
+        for(size_t i = 0; i < cats.size(); ++i)
+        {
+             cats[i].move(-10.f, 0.f); // move each cat sprite slightly
+            if(cats[i].getPosition().x < 0 - cats[i].getGlobalBounds().width) // if the cat goes off screen
+            {
+                cats.erase(cats.begin() + i); // remove the cat if it goes off screen
             }
-
         }
-//collision detection
-        if(!projectiles.empty() && !enemies.empty()){
-            for(size_t i = 0; i < enemies.size(); i++){
-                for(size_t k = 0;k < projectiles.size();k++){
-                    if(enemies[i].getGlobalBounds().intersects(projectiles[k].getGlobalBounds())){
-                        enemies.erase(enemies.begin() + i);
-                        projectiles.erase(projectiles.begin() + k);
-                        break;
-                    }
-                }
+        if(catSpawnTimer < 10)
+        {
+            catSpawnTimer++;
+        }
+        else
+        {
+            cat.setPosition(window.getSize().x, rand() % int(window.getSize().y - cat.getGlobalBounds().height)); // spawn at a random height
+            cats.push_back(cat);
+            catSpawnTimer = 0;
+        }
+
+
+//DOGE(player)
+        doge.setPosition(doge.getPosition().x, Mouse::getPosition(window).y);
+        if(doge.getPosition().y < 0) // if the doge goes off screen
+        {
+            doge.setPosition(doge.getPosition().x, 0); // set the doge's position to the top of the screen
+        }
+        if(doge.getPosition().y > window.getSize().y - doge.getGlobalBounds().height) // if the doge goes off screen
+        {
+            doge.setPosition(doge.getPosition().x, window.getSize().y - doge.getGlobalBounds().height); // set the doge's position to the top of the screen
+        }
+
+//COLLISION
+        for(size_t i = 0; i < cats.size(); ++i)
+        {
+            if(cats[i].getGlobalBounds().intersects(doge.getGlobalBounds())) // if the cat collides with the doge
+            {   
+                hp--;
+                cats.erase(cats.begin() + i); // remove the cat
+                 
             }
         }
 
 
+//UI
+        hpBar.setSize(Vector2f((float)hp * 20.f, 20.f));
 
-
-        // clear the window with black color
+//DRAW
         window.clear(Color::Black);
-
-        // draw everything here...
-        window.draw(player);
-
-        for (const auto& enemy : enemies)
-            window.draw(enemy);
-        for (const auto& projectile : projectiles)
-            window.draw(projectile);
-
-        // end the current frame
+        window.draw(doge);
+        for(size_t i = 0; i < cats.size(); ++i)
+        {
+            window.draw(cats[i]);
+        }
+        window.draw(hpBar);
         window.display();
     }
 
