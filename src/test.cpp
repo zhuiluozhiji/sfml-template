@@ -8,31 +8,19 @@ using namespace std;
 
 int main()
 {
-    // create the window
-    RenderWindow window(VideoMode(800, 600), "My window");
-    window.setFramerateLimit(60); // limit the frame rate to 60 FPS
-
-    // run the program as long as the window is open
-    while (window.isOpen())
+    vector<int> v = {1, 2, 3, 4, 5,6,7,8,9};
+    for(size_t i = 0; i < v.size(); ++i)
     {
-        // check all the window's events that were triggered since the last iteration of the loop
-        Event event;
-        while (window.pollEvent(event))
+        if (true) // Check if the number is even
         {
-            // "close requested" event: we close the window
-            if (event.type == Event::Closed)
-                window.close();
+            v.erase(v.begin() + i); // Remove the even number
+            //i--; // Adjust index after erasing
         }
-
-        // clear the window with black color
-        window.clear(Color::Black);
-
-        // draw everything here...
-        // window.draw(...);
-
-        // end the current frame
-        window.display();
     }
 
+    for(const auto& num : v)
+    {
+        cout << num << " ";
+    }
     return 0;
 }
