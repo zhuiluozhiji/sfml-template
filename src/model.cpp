@@ -1,4 +1,6 @@
 #include <iostream>
+#include <cmath>
+#include <cstdlib>
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>

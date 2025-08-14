@@ -1,4 +1,10 @@
+#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include <iostream>
+#include <cmath>
+#include <cstdlib>
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
@@ -8,32 +14,22 @@ using namespace std;
 
 int main()
 {
+    srand(time(NULL));
     // create the window
     RenderWindow window(VideoMode(800, 600), "My window");
     window.setFramerateLimit(60); // limit the frame rate to 60 FPS
-    Font font;
-    if(!font.loadFromFile("Fonts/weiruanyahei.ttf"))
-        throw("COULD NOT LOAD FONT");
 
 
-    Text text;
-    text.setFont(font);
-    text.setString("Hello, SFML!");
-    text.setCharacterSize(24);
-    text.setFillColor(Color::White);
-    text.setStyle(Text::Bold);
+    RectangleShape rect;
+    rect.setFillColor(Color::White);
+    rect.setSize(Vector2f(100.f, 50.f));
+    rect.setOrigin(50.f, 25.f);
 
-    Font cfont;
-    if(!cfont.loadFromFile("Fonts/huawenfangsong.ttf"))
-        throw("COULD NOT LOAD FONT");
-    Text ctext;
-    ctext.setPosition(0.f,200.f);
-    ctext.setFont(cfont);
-    ctext.setString("华文仿宋");
-    ctext.setCharacterSize(24);
-    ctext.setFillColor(Color::Yellow);
-    ctext.setStyle(Text::Bold);
-
+    CircleShape circle;
+    circle.setFillColor(Color::Green);
+    circle.setRadius(100.f);
+    circle.setOrigin(100.f, 100.f);//先设置好基准点后才能setPosition 顺序反了会报错
+    circle.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f);
     // run the program as long as the window is open
     while (window.isOpen())
     {
@@ -45,14 +41,41 @@ int main()
             if (event.type == Event::Closed)
                 window.close();
         }
+//UPDATE
+        if(Keyboard::isKeyPressed(Keyboard::Up))
+        {
+            rect.move(0.f, -5.f);
+        }
+        if(Keyboard::isKeyPressed(Keyboard::Down))
+        {
+            rect.move(0.f, 5.f);
+        }
+        if(Keyboard::isKeyPressed(Keyboard::Left))
+        {
+            rect.move(-5.f, 0.f);
+        }
+        if(Keyboard::isKeyPressed(Keyboard::Right))
+        {
+            rect.move(5.f, 0.f);
+        }
 
+        if(Keyboard::isKeyPressed(Keyboard::R)){
+            rect.rotate(10.f);
+        }
+        if(rect.getGlobalBounds().intersects(circle.getGlobalBounds()))
+        {
+            rect.setFillColor(Color::Red);
+        }
+        else
+        {
+            rect.setFillColor(Color::White);
+        }
         // clear the window with black color
         window.clear(Color::Black);
 
-        window.draw(text); // draw the text
-        window.draw(ctext); // draw the Chinese text
+        window.draw(rect);
+        window.draw(circle);
 
-        // end the current frame
         window.display();
     }
 
