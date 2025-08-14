@@ -25,10 +25,10 @@ int main()
             if (event.type == Event::Closed)
                 window.close();
         }
-
+//UPDATE
         // clear the window with black color
         window.clear(Color::Black);
-
+//DRAW
         // draw everything here...
         // window.draw(...);
 

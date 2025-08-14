@@ -1,7 +1,3 @@
-#include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
-#include <SFML/System/Vector2.hpp>
-#include <SFML/Window/Keyboard.hpp>
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
@@ -14,22 +10,18 @@ using namespace std;
 
 int main()
 {
-    srand(time(NULL));
     // create the window
     RenderWindow window(VideoMode(800, 600), "My window");
     window.setFramerateLimit(60); // limit the frame rate to 60 FPS
 
+    Clock clock;
+    float dt;
+    float multiplier = 60.f;
 
-    RectangleShape rect;
-    rect.setFillColor(Color::White);
-    rect.setSize(Vector2f(100.f, 50.f));
-    rect.setOrigin(50.f, 25.f);
+    RectangleShape shape(Vector2f(50.f, 50.f));
+    shape.setFillColor(Color::White);
 
-    CircleShape circle;
-    circle.setFillColor(Color::Green);
-    circle.setRadius(100.f);
-    circle.setOrigin(100.f, 100.f);//先设置好基准点后才能setPosition 顺序反了会报错
-    circle.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f);
+
     // run the program as long as the window is open
     while (window.isOpen())
     {
@@ -41,42 +33,37 @@ int main()
             if (event.type == Event::Closed)
                 window.close();
         }
-//UPDATE
-        if(Keyboard::isKeyPressed(Keyboard::Up))
+
+        dt = clock.restart().asSeconds(); // get the time elapsed since the last frame
+        if(Keyboard::isKeyPressed(Keyboard::A))
         {
-            rect.move(0.f, -5.f);
-        }
-        if(Keyboard::isKeyPressed(Keyboard::Down))
-        {
-            rect.move(0.f, 5.f);
-        }
-        if(Keyboard::isKeyPressed(Keyboard::Left))
-        {
-            rect.move(-5.f, 0.f);
-        }
-        if(Keyboard::isKeyPressed(Keyboard::Right))
-        {
-            rect.move(5.f, 0.f);
+            shape.move(-10.f * dt * multiplier, 0.f);
         }
 
-        if(Keyboard::isKeyPressed(Keyboard::R)){
-            rect.rotate(10.f);
-        }
-        if(rect.getGlobalBounds().intersects(circle.getGlobalBounds()))
+        if(Keyboard::isKeyPressed(Keyboard::D))
         {
-            rect.setFillColor(Color::Red);
+            shape.move(10.f * dt * multiplier, 0.f);
         }
-        else
+
+        if(Keyboard::isKeyPressed(Keyboard::W))
         {
-            rect.setFillColor(Color::White);
+            shape.move(0.f, -10.f * dt * multiplier);
         }
+
+        if(Keyboard::isKeyPressed(Keyboard::S))
+        {
+            shape.move(0.f, 10.f * dt * multiplier);
+        }
+
         // clear the window with black color
         window.clear(Color::Black);
 
-        window.draw(rect);
-        window.draw(circle);
+        window.draw(shape); // draw the rectangle shape
+
 
         window.display();
+
+        cout << "Delta time: " << dt << " seconds" << endl;
     }
 
     return 0;
